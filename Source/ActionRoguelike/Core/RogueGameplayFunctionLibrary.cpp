@@ -16,6 +16,13 @@
 
 URogueActionComponent* URogueGameplayFunctionLibrary::GetActionComponentFromActor(AActor* FromActor)
 {
+	if (FromActor == nullptr)
+	{
+		// ...could easily pass in nullptr from Blueprint
+		UE_LOG(LogGame, Warning, TEXT("Attempting to get Action Component from nullptr Actor."));
+		return nullptr;
+	}
+	
 	// Note: Cast<T> on interface only works if the interface was implemented on the Actor in C++
 	// For BP implemented we should change this code to call Execute_GetActionComponent instead...
 	const IRogueActionSystemInterface* ASI = Cast<IRogueActionSystemInterface>(FromActor);
