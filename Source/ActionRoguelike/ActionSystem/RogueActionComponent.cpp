@@ -159,16 +159,45 @@ bool URogueActionComponent::ApplyAttributeChange(const FAttributeModification& M
 		{
 			Event->Broadcast(Attribute->GetValue(), Modification);
 		}
+		
 		// Broadcast any Blueprint listeners
-		/*if (FAttributeChangedDynamicSignature* Event = AttributeDynamicListenerMap.Find(AttributeTag))
+		if (TArray<FAttributeChangedDynamicSignature>* Events = AttributeBlueprintListeners.Find(AttributeTag))
 		{
-			Event->ExecuteIfBound(Attribute->GetValue(), Modification);
-		}*/
+			// Reverse-for to allow cleanup for any events no longer bound to blueprint instances
+			for (int i = Events->Num() - 1; i >= 0; --i)
+			{
+				FAttributeChangedDynamicSignature& Event = (*Events)[i];
+				bool bIsBound = Event.ExecuteIfBound(Attribute->GetValue(), Modification);
+				if (!bIsBound)
+				{
+					Events->RemoveAt(i);
+					UE_LOG(LogGame, Log, TEXT("Cleaned up expired attribute delegate for %s"), *GetNameSafe(GetOwner()));
+				}
+			}
+		}
+		
 		return true;
 	}
 	
 	// no actual change occured
 	return false;
+}
+
+
+void URogueActionComponent::RemoveDynamicAttributeListener(FAttributeChangedDynamicSignature Event)
+{
+	// Iterates all tags and arrays, could be faster if we specify the Tag in the function to know where to remove it.
+	for (TPair<FGameplayTag, TArray<FAttributeChangedDynamicSignature>>& Listener : AttributeBlueprintListeners)
+	{
+		if (Listener.Value.RemoveSingle(Event) > 0)
+		{
+			// found it, skip checking the rest
+			
+			// Temp to verify this is all working
+			UE_LOG(LogTemp, Log, TEXT("Successfully Removed binding from a blueprint"));
+			break;
+		}
+	}
 }
 
 
@@ -183,72 +212,6 @@ bool URogueActionComponent::ApplyAttributeChange(FGameplayTag InAttributeTag, fl
 		InContextTags);
 
 	return ApplyAttributeChange(AttriMod);
-}
-
-
-void URogueActionComponent::K2_AddAttributeListener(FGameplayTag AttributeTag, FAttributeChangedDynamicSignature Event, bool bCallImmediately /*= false*/)
-{
-	if (!AttributeTag.IsValid())
-	{
-		UE_LOG(LogGame, Log, TEXT("No valid GameplayTag specified in AddAttributeListener for %s"), *GetNameSafe(GetOwner()));
-		return;
-	}
-
-	// An "Wrapper" to make the binding easier to use with blueprint (returns handle to unbind from Blueprint instance if needed)
-	// Blueprint graph can manually unbind using K2_RemoveAttributeListener, otherwise the binding will clean up when the attribute change
-	// triggers and we can no longer find a valid binding to the original blueprint delegate (meaning ExecuteIfBound returns false below)
-	FDelegateHandle Handle = GetAttributeListenerDelegate(AttributeTag).AddLambda([Event, AttributeTag, this](float NewValue, FAttributeModification AttriMod)
-	{
-		SCOPED_NAMED_EVENT(Blueprint_OnAttributeChanged, FColor::Blue);
-		// This lamba is executed anytime we trigger the attribute change.
-
-		// This is the blueprint event - May no longer be bound if the blueprint instance has been destroyed/GC'ed
-		bool bIsBound = Event.ExecuteIfBound(NewValue, AttriMod);
-
-		// We instance was deleted, the event is no longer valid
-		if (!bIsBound)
-		{
-			FDelegateHandle Handle = *DynamicDelegateHandles.Find(Event);
-			
-			GetAttributeListenerDelegate(AttributeTag).Remove(Handle);
-			
-			DynamicDelegateHandles.Remove(Event);
-		}
-	});
-
-	// Keep track so it can be cleaned up if blueprint owner is deleted
-	DynamicDelegateHandles.Add(Event, Handle);
-
-	// Calling immediately is convenient for setting up initial states like in UI
-	if (bCallImmediately)
-	{
-		// @todo: maybe change EAttributeModifyType?
-		FAttributeModification AttriMod = FAttributeModification(AttributeTag,
-			0.0f, this, GetOwner(), EAttributeModifyType::Invalid, FGameplayTagContainer());
-
-		FRogueAttribute* FoundAttribute = GetAttribute(AttributeTag);
-		
-		Event.Execute(FoundAttribute->GetValue(), AttriMod);
-	}
-}
-
-void URogueActionComponent::K2_RemoveAttributeListener(FAttributeChangedDynamicSignature Event)
-{
-	// Note: Will fail if we try to remove a non-bound event
-	FDelegateHandle Handle = *DynamicDelegateHandles.Find(Event);
-
-	// Since we don't specify the Tag, we iterate the full list to find the matching Handle
-	for (auto AttributeEvent : AttributeListenerMap)
-	{
-		if (AttributeEvent.Value.Remove(Handle))
-		{
-			// Found match, we are done here
-
-			// Temp to verify this is all working
-			UE_LOG(LogTemp, Log, TEXT("Successfully Removed binding from a blueprint"));
-			break;
-		}
-	}
 }
 
 
@@ -267,6 +230,12 @@ void URogueActionComponent::InitAttributeSet()
 FAttributeChangedSignature& URogueActionComponent::GetAttributeListenerDelegate(FGameplayTag InTag)
 {
 	return AttributeListenerMap.FindOrAdd(InTag);
+}
+
+void URogueActionComponent::AddDynamicAttributeListener(FAttributeChangedDynamicSignature Event, FGameplayTag InTag)
+{
+	TArray<FAttributeChangedDynamicSignature>& Events = AttributeBlueprintListeners.FindOrAdd(InTag);
+	Events.Add(Event);
 }
 
 

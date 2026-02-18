@@ -67,17 +67,16 @@ public:
 	 */
 	FAttributeChangedSignature& GetAttributeListenerDelegate(FGameplayTag InTag);
 
+	UFUNCTION(BlueprintCallable, DisplayName="Add Attribute Listener", meta = (Keywords="event,delegate"))
+	void AddDynamicAttributeListener(FAttributeChangedDynamicSignature Event, FGameplayTag InTag);
+
 protected:
 
 	UFUNCTION(BlueprintCallable, Category=Attributes, DisplayName="GetAttribute")
 	bool K2_GetAttribute(FGameplayTag InAttributeTag, float& CurrentValue, float& Base, float& Delta);
 
-	/* Marked protected, C++ can use direct access to the OnAttributeChanged inside an Attribute */
-	UFUNCTION(BlueprintCallable, DisplayName="AddAttributeListener", meta = (Keywords = "Bind, Delegate", AdvancedDisplay="bCallImmediately"))
-	void K2_AddAttributeListener(FGameplayTag AttributeTag, FAttributeChangedDynamicSignature Event, bool bCallImmediately = false);
-
-	UFUNCTION(BlueprintCallable)
-	void K2_RemoveAttributeListener(FAttributeChangedDynamicSignature Event);
+	UFUNCTION(BlueprintCallable, DisplayName="Remove Attribute Listener", meta = (Keywords="event,delegate"))
+	void RemoveDynamicAttributeListener(FAttributeChangedDynamicSignature Event);
 
 	/* Interchangeable set of attributes such as Health, BaseDamage, Strength, Stamina, MoveSpeed, etc. */
 	UPROPERTY(EditAnywhere, Instanced, NoClear, ReplicatedUsing=OnRep_AttributeSet)
@@ -92,6 +91,8 @@ protected:
 	TMap<FAttributeChangedDynamicSignature, FDelegateHandle> DynamicDelegateHandles;
 
 	TMap<FGameplayTag, FAttributeChangedSignature> AttributeListenerMap;
+	
+	TMap<FGameplayTag, TArray<FAttributeChangedDynamicSignature>> AttributeBlueprintListeners;
 	
 	UFUNCTION(Server, Reliable)
 	void ServerStartAction(AActor* Instigator, FGameplayTag ActionName);
