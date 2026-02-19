@@ -9,6 +9,15 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
+
+URogueMonsterAttributeSet::URogueMonsterAttributeSet()
+{
+	// Override with lower default attack damage than players
+	AttackDamage = FRogueAttribute(10);
+		
+	MoveSpeed = FRogueAttribute(450);
+}
+
 // -- Health Attribute Set -- //
 
 void URogueHealthAttributeSet::OnRep_Health(FRogueAttribute OldValue)
@@ -20,8 +29,7 @@ void URogueHealthAttributeSet::OnRep_Health(FRogueAttribute OldValue)
 	Modification.Magnitude = Health.GetValue() - OldValue.GetValue();
 	Modification.TargetComp = OwningComp;
 
-	// @todo: swap out modification struct with flat params.
-	OwningComp->GetAttributeListenerDelegate(SharedGameplayTags::Attribute_Health).Broadcast(NewValue, Modification);
+	OwningComp->BroadcastAttributeChanged(SharedGameplayTags::Attribute_Health, NewValue, Modification);
 }
 
 

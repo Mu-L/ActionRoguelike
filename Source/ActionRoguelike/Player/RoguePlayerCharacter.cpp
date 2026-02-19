@@ -24,8 +24,9 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RoguePlayerCharacter)
 
 
-// Sets default values
-ARoguePlayerCharacter::ARoguePlayerCharacter()
+
+ARoguePlayerCharacter::ARoguePlayerCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -41,7 +42,7 @@ ARoguePlayerCharacter::ARoguePlayerCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	ActionComp = CreateDefaultSubobject<URogueActionComponent>(TEXT("ActionComp"));
-	ActionComp->SetDefaultAttributeSet(URogueSurvivorAttributeSet::StaticClass());
+	ActionComp->SetDefaultAttributeSet(ObjectInitializer, URogueSurvivorAttributeSet::StaticClass());
 
 	PerceptionStimuliComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("PerceptionStimuliComp"));
 
@@ -83,7 +84,6 @@ void ARoguePlayerCharacter::PostInitializeComponents()
 }
 
 
-// Called to bind functionality to input
 void ARoguePlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

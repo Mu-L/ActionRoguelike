@@ -153,11 +153,6 @@ bool URogueGameplayFunctionLibrary::ApplyDirectionalDamage(AActor* DamageCauser,
 		return true;
 	}
 
-
-	// Call into Unreal built in logic for early course damaging of explosive barrel
-	// Don't have a proper way of knowing it was processed, so we return false
-	//UGameplayStatics::ApplyDamage(TargetActor, DamageAmount, nullptr, DamageCauser, nullptr);
-
 	return false;
 }
 

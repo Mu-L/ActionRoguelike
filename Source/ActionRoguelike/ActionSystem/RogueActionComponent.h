@@ -47,8 +47,6 @@ public:
 	/* Stop every action, for example during death */
 	void StopAllActions();
 
-	URogueActionComponent();
-
 	FRogueAttribute* GetAttribute(FGameplayTag InAttributeTag);
 
 	float GetAttributeValue(FGameplayTag InAttributeTag);
@@ -60,7 +58,7 @@ public:
 	bool ApplyAttributeChange(FGameplayTag InAttributeTag, float InMagnitude, AActor* Instigator, EAttributeModifyType ModType, FGameplayTagContainer InContextTags = FGameplayTagContainer());
 
 	/* Provide a default attribute set type for (base) classes, blueprint can set this via the details panel instead */
-	void SetDefaultAttributeSet(TSubclassOf<URogueAttributeSet> InNewClass);
+	void SetDefaultAttributeSet(const FObjectInitializer& ObjectInitializer, const TSubclassOf<URogueAttributeSet>& InNewClass);
 
 	/*
 	 * Retrieve the delegate to bind attribute change events, will create new entry in the Map if not currently present
@@ -68,7 +66,9 @@ public:
 	FAttributeChangedSignature& GetAttributeListenerDelegate(FGameplayTag InTag);
 
 	UFUNCTION(BlueprintCallable, DisplayName="Add Attribute Listener", meta = (Keywords="event,delegate"))
-	void AddDynamicAttributeListener(FAttributeChangedDynamicSignature Event, FGameplayTag InTag);
+	void AddDynamicAttributeListener(FAttributeChangedDynamicSignature Event, FGameplayTag InTag, bool bCallImmediately = false);
+
+	void BroadcastAttributeChanged(FGameplayTag InTag, float InNewValue, FAttributeModification InModification);
 
 protected:
 
@@ -84,6 +84,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_AttributeSet();
+
+	UFUNCTION()
+	void OnRep_Actions();
 
 	void InitAttributeSet();
 
@@ -117,10 +120,9 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UFUNCTION()
-	void OnRep_Actions();
-
 public:	
+
+	URogueActionComponent();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnActionStateChanged OnActionStarted;

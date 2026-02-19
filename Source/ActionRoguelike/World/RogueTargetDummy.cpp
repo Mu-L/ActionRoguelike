@@ -10,13 +10,14 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RogueTargetDummy)
 
 
-ARogueTargetDummy::ARogueTargetDummy()
+ARogueTargetDummy::ARogueTargetDummy(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	SkelMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
 	RootComponent = SkelMeshComp;
 
 	ActionComp = CreateDefaultSubobject<URogueActionComponent>(TEXT("ActionComp"));
-	ActionComp->SetDefaultAttributeSet(URogueHealthAttributeSet::StaticClass());
+	ActionComp->SetDefaultAttributeSet(ObjectInitializer, URogueHealthAttributeSet::StaticClass());
 }
 
 

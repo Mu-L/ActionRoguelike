@@ -29,7 +29,7 @@ void URogueActionComponent::InitializeComponent()
 	// Call before Super:: as we verify we haven't initialized yet
 	if (AttributeSet == nullptr)
 	{
-		SetDefaultAttributeSet(URogueAttributeSet::StaticClass());
+		AttributeSet = NewObject<URogueAttributeSet>(this, URogueAttributeSet::StaticClass());
 		UE_LOG(LogGame, Warning, TEXT("No default AttributeSet was specified. Set using SetDefaultAttributeSet during Actor construction"
 								"or assign in the Blueprint details panel in the ActionComponent of %s"), *GetNameSafe(GetOwner()));
 	}
@@ -154,27 +154,7 @@ bool URogueActionComponent::ApplyAttributeChange(const FAttributeModification& M
 	// With clamping inside the attribute (or a zero delta) no real change might have occured
 	if (!FMath::IsNearlyEqual(OriginalValue, Attribute->GetValue()))
 	{
-		// Broadcast for all native listeners
-		if (FAttributeChangedSignature* Event = AttributeListenerMap.Find(AttributeTag))
-		{
-			Event->Broadcast(Attribute->GetValue(), Modification);
-		}
-		
-		// Broadcast any Blueprint listeners
-		if (TArray<FAttributeChangedDynamicSignature>* Events = AttributeBlueprintListeners.Find(AttributeTag))
-		{
-			// Reverse-for to allow cleanup for any events no longer bound to blueprint instances
-			for (int i = Events->Num() - 1; i >= 0; --i)
-			{
-				FAttributeChangedDynamicSignature& Event = (*Events)[i];
-				bool bIsBound = Event.ExecuteIfBound(Attribute->GetValue(), Modification);
-				if (!bIsBound)
-				{
-					Events->RemoveAt(i);
-					UE_LOG(LogGame, Log, TEXT("Cleaned up expired attribute delegate for %s"), *GetNameSafe(GetOwner()));
-				}
-			}
-		}
+		BroadcastAttributeChanged(AttributeTag, Attribute->GetValue(), Modification);
 		
 		return true;
 	}
@@ -232,19 +212,57 @@ FAttributeChangedSignature& URogueActionComponent::GetAttributeListenerDelegate(
 	return AttributeListenerMap.FindOrAdd(InTag);
 }
 
-void URogueActionComponent::AddDynamicAttributeListener(FAttributeChangedDynamicSignature Event, FGameplayTag InTag)
+void URogueActionComponent::AddDynamicAttributeListener(FAttributeChangedDynamicSignature Event, FGameplayTag InTag, bool bCallImmediately /*= false*/)
 {
 	TArray<FAttributeChangedDynamicSignature>& Events = AttributeBlueprintListeners.FindOrAdd(InTag);
 	Events.Add(Event);
+
+	if (bCallImmediately)
+	{
+		// Fill with minimal info available, useful for setting up initial states in UI etc.
+		const FAttributeModification AttriMod = FAttributeModification(InTag,
+			0.0f,
+			this,
+			GetOwner(),
+			EAttributeModifyType::Invalid,
+			FGameplayTagContainer());
+
+		Event.Execute(GetAttributeValue(InTag), AttriMod);
+	}
+}
+
+void URogueActionComponent::BroadcastAttributeChanged(FGameplayTag InTag, float InNewValue, FAttributeModification InModification)
+{
+	// Broadcast for all native listeners
+	if (FAttributeChangedSignature* Event = AttributeListenerMap.Find(InTag))
+	{
+		Event->Broadcast(InNewValue, InModification);
+	}
+		
+	// Broadcast any Blueprint listeners
+	if (TArray<FAttributeChangedDynamicSignature>* Events = AttributeBlueprintListeners.Find(InTag))
+	{
+		// Reverse-for to allow cleanup for any events no longer bound to blueprint instances
+		for (int i = Events->Num() - 1; i >= 0; --i)
+		{
+			FAttributeChangedDynamicSignature& Event = (*Events)[i];
+			bool bIsBound = Event.ExecuteIfBound(InNewValue, InModification);
+			if (!bIsBound)
+			{
+				Events->RemoveAt(i);
+				UE_LOG(LogGame, Log, TEXT("Cleaned up expired attribute delegate for %s"), *GetNameSafe(GetOwner()));
+			}
+		}
+	}
 }
 
 
-void URogueActionComponent::SetDefaultAttributeSet(TSubclassOf<URogueAttributeSet> InNewClass)
+void URogueActionComponent::SetDefaultAttributeSet(const FObjectInitializer& ObjectInitializer, const TSubclassOf<URogueAttributeSet>& InNewClass)
 {
 	// Only allow during init
 	check(!HasBeenInitialized());
-	
-	AttributeSet = NewObject<URogueAttributeSet>(this, InNewClass, TEXT("Attributes"));
+
+	AttributeSet = Cast<URogueAttributeSet>(ObjectInitializer.CreateDefaultSubobject(this, TEXT("Attributes"), InNewClass, InNewClass));
 }
 
 
