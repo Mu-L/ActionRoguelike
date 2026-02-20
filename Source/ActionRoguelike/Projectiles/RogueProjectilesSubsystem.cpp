@@ -327,8 +327,9 @@ void URogueProjectilesSubsystem::SpawnImpactFX(const UWorld* World, const FProje
 		FNiagaraDataChannelSearchParameters Params = FNiagaraDataChannelSearchParameters(ImpactPosition);
 
 		// DECAL, using the Data Channels rather than relying on individual particle systems
+		// only visible to CPU, for GPU particles we probably need "GPU" to be true instead 
 		UNiagaraDataChannelWriter* Writer = UNiagaraDataChannelLibrary::WriteToNiagaraDataChannel(World, ProjConfig.ConfigDataAsset->ImpactDecal_DataChannel,
-			Params, 1, false, false, false, "ImpactDecals");
+			Params, 1, false, true, false, "ImpactDecals");
 
 		Writer->WriteVector("ImpactLocation", 0, ImpactPosition);
 		Writer->WriteVector("ImpactNormal", 0, ProjConfig.Hit.ImpactNormal);
