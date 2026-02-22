@@ -4,10 +4,20 @@
 
 **Main Branch Engine Version: 5.6** <br>
 
-Please we aware the main branch is a bit of a playground for experimentation of code and systems that may eventually turn into a blog post, or in one of my courses (C++ or Game Optimization). As an example, currently the projectiles have both Object Pooling mechanism AND an experimental Data Oriented Design approach to projectiles using no Actors at all. This may affect stability and is not always supporting multiplayer yet.
+The main branch is a bit of a playground for experimentation of new systems that may eventually turn into a blog post or in one of my courses (C++ or Game Optimization). For example, the projectiles have both Object Pooling mechanism AND an experimental Data Oriented Design approach to projectiles using no Actors at all. This may affect stability and is not always supporting multiplayer yet until the systems stabilize over time.
 
 > ### Learn Unreal Engine C++ The Epic Way
 > **Want to learn how to build this C++ Game from scratch? Learn more at [Professional Game Development in C++ and Unreal Engine Course](https://courses.tomlooman.com/p/unrealengine-cpp?coupon_code=COMMUNITY15&src=github)**
+
+# Browsing Older Releases
+
+The project has been updated over the years to keep up with the latest Unreal Engine release. Additionally, new features are added to the project, often related to new Articles or Tutorials posted on [tomlooman.com](https://tomlooman.com). These are available on the Main Branch.
+
+**For C++ Course Students:** 
+- **For the original UE4 version:** [Lecture29-FinishedProject](https://github.com/tomlooman/ActionRoguelike/tree/Lecture29-FinishedProject) for finished course code without additions all the way back to UE4.25.
+- **For the new UE5.6 version of the course:** [UE5.6-CourseProject](https://github.com/tomlooman/ActionRoguelike/tree/UE5.6-CourseProject) which has a commit URL with each lesson of the C++ course for easy reference.
+
+![GitHub Branch Selection Info](https://tomlooman.com/assets/images/github_branchesinfo.jpg)
 
 # Project Features
 
@@ -71,16 +81,6 @@ Note: The AnimMontage holds a Melee Attack animation and requires the custom Ani
 Animation Budget Allocator plugin for the enemy AI. Define the allocated animation budget using scalability CVAR (**a.Budget.BudgetMs**) inside **DefaultScalability.ini**. View the budgeting debug and profiling information using **a.Budget.Debug.Enabled** and **stat AnimationBudgetAllocator**. The ARogueAICharacter class includes the optional OnReduceAnimationWork callback to allow custom logic to further throttle anim quality when necessary.
 
 You can get a quick overview by checking out the [initial commit](https://github.com/tomlooman/ActionRoguelike/commit/bbf4ea3f1af05d2b3acdbcc3d2312137015d5789). Read more on the [Animation Budget Allocator Docs Page](https://dev.epicgames.com/documentation/en-us/unreal-engine/animation-budget-allocator-in-unreal-engine) which contains all the steps to implement this in your own projects.
-
-# Browsing Older Releases
-
-The project has been updated over the years to keep up with the latest Unreal Engine release. Additionally, new features are added to the project, often related to new Articles or Tutorials posted on [tomlooman.com](https://tomlooman.com). These will be included on the main branch, on whatever the latest UE version is at the time.
-
-**For C++ Course Students:** 
-- For the original UE4 version: View branch [Lecture29-FinishedProject](https://github.com/tomlooman/ActionRoguelike/tree/Lecture29-FinishedProject) for finished course code without additions all the way back to UE4.25.
-- For the new UE5.6 version of the course: [UE5.6-CourseProject](https://github.com/tomlooman/ActionRoguelike/tree/UE5.6-CourseProject) which is also available per individual commit with each lesson of the course.
-
-![GitHub Branch Selection Info](https://tomlooman.com/assets/images/github_branchesinfo.jpg)
 
 # Credits
 
