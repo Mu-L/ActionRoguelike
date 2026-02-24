@@ -99,7 +99,7 @@ protected:
 
 public:	
 
-	ARoguePlayerCharacter(const FObjectInitializer& ObjectInitializer);
+	ARoguePlayerCharacter();
 
 	virtual FVector GetPawnViewLocation() const override;
 

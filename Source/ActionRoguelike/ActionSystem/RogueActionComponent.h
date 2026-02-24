@@ -58,7 +58,7 @@ public:
 	bool ApplyAttributeChange(FGameplayTag InAttributeTag, float InMagnitude, AActor* Instigator, EAttributeModifyType ModType, FGameplayTagContainer InContextTags = FGameplayTagContainer());
 
 	/* Provide a default attribute set type for (base) classes, blueprint can set this via the details panel instead */
-	void SetDefaultAttributeSet(const FObjectInitializer& ObjectInitializer, const TSubclassOf<URogueAttributeSet>& InNewClass);
+	void SetDefaultAttributeSet(const TSubclassOf<URogueAttributeSet>& InNewClass);
 
 	/*
 	 * Retrieve the delegate to bind attribute change events, will create new entry in the Map if not currently present

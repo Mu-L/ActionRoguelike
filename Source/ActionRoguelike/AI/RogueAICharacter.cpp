@@ -34,7 +34,7 @@ ARogueAICharacter::ARogueAICharacter(const FObjectInitializer& ObjectInitializer
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<USkeletalMeshComponentBudgeted>(ACharacter::MeshComponentName))
 {
 	ActionComp = CreateDefaultSubobject<URogueActionComponent>(TEXT("ActionComp"));
-	ActionComp->SetDefaultAttributeSet(ObjectInitializer, URogueMonsterAttributeSet::StaticClass());
+	ActionComp->SetDefaultAttributeSet(URogueMonsterAttributeSet::StaticClass());
 
 	AttackSoundComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AttackAudioComp"));
 	AttackSoundComp->SetupAttachment(RootComponent);

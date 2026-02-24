@@ -13,11 +13,10 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RogueExplosiveBarrel)
 
 
-ARogueExplosiveBarrel::ARogueExplosiveBarrel(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+ARogueExplosiveBarrel::ARogueExplosiveBarrel()
 {
 	ActionComp = CreateDefaultSubobject<URogueActionComponent>(TEXT("ActionComp"));
-	ActionComp->SetDefaultAttributeSet(ObjectInitializer, URogueHealthAttributeSet::StaticClass());
+	ActionComp->SetDefaultAttributeSet(URogueHealthAttributeSet::StaticClass());
 	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetSimulatePhysics(true);

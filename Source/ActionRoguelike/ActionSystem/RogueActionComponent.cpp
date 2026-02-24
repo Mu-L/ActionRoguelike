@@ -257,11 +257,12 @@ void URogueActionComponent::BroadcastAttributeChanged(FGameplayTag InTag, float 
 }
 
 
-void URogueActionComponent::SetDefaultAttributeSet(const FObjectInitializer& ObjectInitializer, const TSubclassOf<URogueAttributeSet>& InNewClass)
+void URogueActionComponent::SetDefaultAttributeSet(const TSubclassOf<URogueAttributeSet>& InNewClass)
 {
 	// Only allow during init
 	check(!HasBeenInitialized());
 
+	const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get();
 	AttributeSet = Cast<URogueAttributeSet>(ObjectInitializer.CreateDefaultSubobject(this, TEXT("Attributes"), InNewClass, InNewClass));
 }
 

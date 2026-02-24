@@ -25,8 +25,7 @@
 
 
 
-ARoguePlayerCharacter::ARoguePlayerCharacter(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+ARoguePlayerCharacter::ARoguePlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -42,7 +41,7 @@ ARoguePlayerCharacter::ARoguePlayerCharacter(const FObjectInitializer& ObjectIni
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	ActionComp = CreateDefaultSubobject<URogueActionComponent>(TEXT("ActionComp"));
-	ActionComp->SetDefaultAttributeSet(ObjectInitializer, URogueSurvivorAttributeSet::StaticClass());
+	ActionComp->SetDefaultAttributeSet(URogueSurvivorAttributeSet::StaticClass());
 
 	PerceptionStimuliComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("PerceptionStimuliComp"));
 

@@ -56,7 +56,7 @@ public:
 		return ActionComp;
 	}
 	
-	ARogueExplosiveBarrel(const FObjectInitializer& ObjectInitializer);
+	ARogueExplosiveBarrel();
 
 	virtual void PostInitializeComponents() override;
 };

@@ -28,7 +28,7 @@ protected:
 	
 public:	
 
-	ARogueTargetDummy(const FObjectInitializer& ObjectInitializer);
+	ARogueTargetDummy();
 
 	virtual void PostInitializeComponents() override;
 
