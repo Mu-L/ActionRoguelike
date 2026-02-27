@@ -23,8 +23,10 @@
 #include "NavigationSystem.h"
 #include "AnimationBudgetAllocator/Private/AnimationBudgetAllocatorModule.h"
 #include "Core/RogueMessagingSubsystem.h"
+#include "Core/RogueMonsterData.h"
 #include "Pickups/RoguePickupSubsystem.h"
 #include "Subsystems/RogueMonsterCorpseSubsystem.h"
+#include "World/RogueMonsterCorpse.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RogueAICharacter)
 
@@ -228,16 +230,20 @@ void ARogueAICharacter::OnHealthAttributeChanged(float NewValue, const FAttribut
 				
 			}
 
-			// ragdoll
-			GetMesh()->SetAllBodiesSimulatePhysics(true);
-			GetMesh()->SetCollisionProfileName(Collision::Ragdoll_ProfileName);
-
+			// We swap out a special ragdoll-only Actor that handles all visuals of the mesh and hide this enemy to reclaim into a pool.
+			
+			GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			GetCharacterMovement()->DisableMovement();
 
-			//SetLifeSpan(10.0f);
+			// Hide and prepare to pool @todo: implement some actual pooling
+			SetActorHiddenInGame(true);
+			// @fixme: enabled lifespan again to kill hidden monsters until we implement pooling for them
+			// @todo: remember to clear CorpseInstance on the pooled monster when he is claimed from the pool
+			SetLifeSpan(2.0f);
+			
 			URogueMonsterCorpseSubsystem* CorpseSystem = GetWorld()->GetSubsystem<URogueMonsterCorpseSubsystem>();
-			CorpseSystem->AddCorpse(this);
+			CorpseInstance = CorpseSystem->FetchCorpse(this, MonsterConfig);
 			return;
 		}
 
@@ -270,6 +276,27 @@ AActor* ARogueAICharacter::GetTargetActor() const
 }
 
 
+bool ARogueAICharacter::AddImpulseAtLocationCustom(FVector Impulse, FVector Location, FName BoneName)
+{
+	// While instance is available, we can assume this character just died
+	if (CorpseInstance)
+	{
+		CorpseInstance->AddImpulseAtLocationCustom(Impulse, Location, BoneName);
+	}
+	else // Alive
+	{
+		USkeletalMeshComponent* MeshComp = GetMesh();
+		if (MeshComp->IsSimulatingPhysics(BoneName))
+		{
+			MeshComp->AddImpulseAtLocation(Impulse, Location, BoneName);
+		}
+	}
+
+	// handled
+	return true;
+}
+
+
 void ARogueAICharacter::MulticastPlayAttackFX_Implementation()
 {
 	AttackSoundComp->Play();
@@ -298,6 +325,12 @@ void ARogueAICharacter::OnReduceAnimationWork(class USkeletalMeshComponentBudget
 	UE_LOG(LogGame, Log, TEXT("OnReduceAnimWork for bot %s, reducing = %s"), *GetName(), (bReduce ? TEXT("true") : TEXT("false")));
 
 	// @todo: Actually throttle some work, for example, detach certain components on the skeletal mesh IF we had any in the first place
+}
+
+
+UDataAsset* ARogueAICharacter::GetActorConfigData() const
+{
+	return MonsterConfig;
 }
 
 

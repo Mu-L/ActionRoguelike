@@ -2,6 +2,7 @@
 
 
 #include "RogueProjectile_Magic.h"
+
 #include "Components/SphereComponent.h"
 #include "Core/RogueGameplayFunctionLibrary.h"
 #include "ActionSystem/RogueActionComponent.h"
@@ -58,8 +59,15 @@ void ARogueProjectile_Magic::OnActorOverlap(UPrimitiveComponent* OverlappedCompo
 
 			if (HasAuthority())
 			{
+				// Handfill the info, SweepResult not always available
+				FHitResult Hit = FHitResult(OtherActor, OtherComp,
+					bFromSweep ? FVector(SweepResult.Location) : GetActorLocation(),
+					bFromSweep ? FVector(SweepResult.Normal) : -GetActorRotation().Vector());
+				Hit.Normal = GetActorRotation().Vector();
+				Hit.BoneName = SweepResult.BoneName;
+				
 				// Apply Damage & Impulse
-				URogueGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageCoefficient, SweepResult, ContextTags);
+				URogueGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageCoefficient, Hit, ContextTags);
 				
 				APawn* MyInstigator = GetInstigator();
 				if (OtherActionComp && BurningActionClass)

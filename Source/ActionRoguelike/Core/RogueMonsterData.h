@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "RogueMonsterData.generated.h"
 
+class ARogueMonsterCorpse;
 class URogueAction;
 
 /**
@@ -27,6 +28,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<UTexture2D> Icon;
+
+	UPROPERTY(EditDefaultsOnly, Category=Corpses)
+	TSubclassOf<UAnimInstance> CorpseAnimInstance;
+
+	/*
+	 * Allow remapping bones to others in the skeleton to better handle impulses (eg. for corpse ragdolling)
+	 */
+	UPROPERTY(EditDefaultsOnly, Category=Physics)
+	TMap<FName, FName> ImpulseBoneRemapping;
+	
 
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override
 	{

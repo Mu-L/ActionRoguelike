@@ -8,6 +8,9 @@
 #include "RogueMonsterCorpseSubsystem.generated.h"
 
 
+class URogueMonsterData;
+class ARogueMonsterCorpse;
+
 USTRUCT()
 struct FMonsterCorpseInfo
 {
@@ -42,7 +45,9 @@ class ACTIONROGUELIKE_API URogueMonsterCorpseSubsystem : public UTickableWorldSu
 
 public:
 	
-	void AddCorpse(AActor* InActor);
+	ARogueMonsterCorpse* FetchCorpse(AActor* InActor, URogueMonsterData* MonsterData);
+
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 protected:
 
