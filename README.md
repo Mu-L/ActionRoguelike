@@ -1,17 +1,23 @@
-# Action Roguelike C++ Unreal Engine Game
+# Co-op Action Roguelike Unreal Engine Sample Game
 
 ![Course Header](https://tomlooman.com/assets/images/coursecpp_banner_widenarrow-3.png)
 
+Welcome to the **Co-op Action Roguelike Sample Game** made in Unreal Engine 5 and C++. The project is an evolution of the game you build during the [Professional Game Development in C++ and Unreal Engine 5](https://tomlooman.com/courses/unrealengine-cpp) Course and is my continued effort at building the most advanced sample game for Unreal Engine, while being easy to understand, learn from and adapt to your own games.
+
 **Main Branch Engine Version: 5.6** <br>
 
-The main branch is a bit of a playground for experimentation of new systems that may eventually turn into a blog post or in one of my courses (C++ or Game Optimization). For example, the projectiles have both Object Pooling mechanism AND an experimental Data Oriented Design approach to projectiles using no Actors at all. This may affect stability and is not always supporting multiplayer yet until the systems stabilize over time.
+The main branch is a bit of a playground for experimentation of new systems that may eventually turn into a blog post or in one of my courses (C++ or Game Optimization). For example, the projectiles have both Object Pooling mechanism AND an experimental Data Oriented Design approach to projectiles using no Actors at all. This may affect stability and is not always supporting multiplayer yet until the systems stabilize over time. Many of the experimental features are disabled by default using `#define` directives to easily toggle on/off during compilation.
 
 > ### Learn Unreal Engine C++ The Epic Way
 > **Want to learn how to build this C++ Game from scratch? Learn more at [Professional Game Development in C++ and Unreal Engine Course](https://courses.tomlooman.com/p/unrealengine-cpp?coupon_code=COMMUNITY15&src=github)**
 
-# Browsing Older Releases
+# Project Documentation
 
-The project has been updated over the years to keep up with the latest Unreal Engine release. Additionally, new features are added to the project, often related to new Articles or Tutorials posted on [tomlooman.com](https://tomlooman.com). These are available on the Main Branch.
+You can read detailed information about this project and game features on the [Documentation Page](https://tomlooman.com/unreal-engine-sample-game-action-roguelike). This includes references to tutorials and other articles I have written about this project such as how to implement the [Save Game System](https://tomlooman.com/unreal-engine-cpp-save-system/) for your own game.
+
+# Course Project Branches
+
+The game on the main branch has been updated over the years to keep up with the latest Unreal Engine release. Additionally, many new features are added to the project, often related to new Articles or Tutorials posted on [tomlooman.com](https://tomlooman.com). For students following the Unreal Engine C++ Courses, use one of these two branches:
 
 **For C++ Course Students:** 
 - **For the original UE4 version:** [Lecture29-FinishedProject](https://github.com/tomlooman/ActionRoguelike/tree/Lecture29-FinishedProject) for finished course code without additions all the way back to UE4.25.
@@ -57,30 +63,6 @@ The project has been updated over the years to keep up with the latest Unreal En
   - Actor Pooling (Projectiles)
 - Async Line tracing Example
 - PSO Precaching & Bundled PSOs Setup for Windows DX12
-
-<br>
-
-# Melee Combat System
-
-The game includes Melee attacks for enemy AI behaviors. The melee system builds on the Action System (similar to GAS) and uses Behavior Trees to initiate the logic to run up and perform the melee attack.
-
-**Walkthrough**
-- The Enemy's BehaviorTree checks if target (player) is within certain distance, and initiate melee attack sequence (run closer then attack when in attack range)
-- **[RogueAction_MinionMeleeAttack](https://github.com/tomlooman/ActionRoguelike/blob/master/Source/ActionRoguelike/AI/RogueAction_MinionMeleeAttack.cpp)** (Action) handles the start/stop of the attack. Runs an AnimMontage with the attack animation. 
-- **[RogueAnimationInstance](https://github.com/tomlooman/ActionRoguelike/blob/master/Source/ActionRoguelike/Animation/RogueAnimInstance.cpp)** (AnimBlueprint) contains *OnMeleeOverlap* which the Melee Attack Action listens for.
-- **[RogueAnimNotifyState_Melee](https://github.com/tomlooman/ActionRoguelike/blob/master/Source/ActionRoguelike/Animation/RogueAnimNotifyState_Melee.cpp)** (AnimNotify) broadcasts *OnMeleeOverlap* event when an melee overlap is found by running *OverlapMultiByChannel* colision query while the AnimNotify is active.
-  - **game.drawdebugmelee 1** to visualize the overlap shape during melee attack.
-  - OnMeleeOverlap is handled by the Melee Attack Action to apply Damage to the hit target.
-
-Note: The AnimMontage holds a Melee Attack animation and requires the custom AnimNotify in order to handle the overlap checks.
-
-# Performance & Optimization
-
-## Animation Budget Allocator
- 
-Animation Budget Allocator plugin for the enemy AI. Define the allocated animation budget using scalability CVAR (**a.Budget.BudgetMs**) inside **DefaultScalability.ini**. View the budgeting debug and profiling information using **a.Budget.Debug.Enabled** and **stat AnimationBudgetAllocator**. The ARogueAICharacter class includes the optional OnReduceAnimationWork callback to allow custom logic to further throttle anim quality when necessary.
-
-You can get a quick overview by checking out the [initial commit](https://github.com/tomlooman/ActionRoguelike/commit/bbf4ea3f1af05d2b3acdbcc3d2312137015d5789). Read more on the [Animation Budget Allocator Docs Page](https://dev.epicgames.com/documentation/en-us/unreal-engine/animation-budget-allocator-in-unreal-engine) which contains all the steps to implement this in your own projects.
 
 # Credits
 
