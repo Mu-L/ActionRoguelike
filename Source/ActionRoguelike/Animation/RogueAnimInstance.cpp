@@ -32,6 +32,7 @@ void URogueAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (ActionComp)
 	{
+		// Ideally we just listen for GameplayTag Add/Removed Delegate instead of polling during Tick
 		bIsStunned = ActionComp->ActiveGameplayTags.HasTag(SharedGameplayTags::Status_Stunned);
 	}
 }

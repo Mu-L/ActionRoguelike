@@ -133,9 +133,7 @@ void URoguePickupSubsystem::Tick(float DeltaTime)
 		// Performance Note: This processing is laid out to move around and touch as few things per iteration
 		// Therefor we first process all the possible coin pickups and count the total credits before we
 		// award any of the players which may end up triggering a bunch of other delegates and pulling classes/data into memory
-		
-		// Note multiplayer: Even clients may run the logic locally to trigger cosmetic pickup events
-		
+
 		TArray<FVector> Players;
 		TArray<ARoguePlayerCharacter*> PlayerPawns;
 		TArray<int32> TotalCreditsPerPlayer;
@@ -214,7 +212,7 @@ void URoguePickupSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	UWorld* World = GetWorld();
 
-	// Temp sync loading of the sound, can hitch
+	// Temp sync loading of the sound, can hitch //@todo: make async
 	USoundBase* SoundAsset = GetDefault<URogueDeveloperSettings>()->PickupCoinSound.LoadSynchronous();
 		
 	CoinPickupAudioComp = NewObject<UAudioComponent>(World, NAME_None, RF_Transient);
