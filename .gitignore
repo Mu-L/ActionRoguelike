@@ -5,6 +5,7 @@
 # Rider
 .idea/
 Plugins/Developer/RiderLink
+*.DotSettings.user
 
 # Compiled Object files
 *.slo
