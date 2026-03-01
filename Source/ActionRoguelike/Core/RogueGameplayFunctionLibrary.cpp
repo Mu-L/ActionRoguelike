@@ -4,6 +4,7 @@
 #include "Core/RogueGameplayFunctionLibrary.h"
 
 #include "ActionRoguelike.h"
+#include "RogueGameplayInterface.h"
 #include "ShaderPipelineCache.h"
 #include "SharedGameplayTags.h"
 #include "ActionSystem/RogueActionComponent.h"
@@ -141,14 +142,23 @@ bool URogueGameplayFunctionLibrary::ApplyDirectionalDamage(AActor* DamageCauser,
 	if (ApplyDamage(DamageCauser, TargetActor, DamageCoefficient, InContextTags))
 	{
 		UPrimitiveComponent* HitComp = HitResult.GetComponent();
-		if (HitComp->bApplyImpulseOnDamage && HitComp->IsSimulatingPhysics(HitResult.BoneName))
-		{
-			// Direction = Target - Origin
-			FVector Direction = HitResult.TraceEnd - HitResult.TraceStart;
-			Direction.Normalize();
 
-			// @todo: allow configuration for impulse strength
-			HitComp->AddImpulseAtLocation(Direction * 30000.f, HitResult.ImpactPoint, HitResult.BoneName);
+		ensure(!HitResult.Normal.IsZero());
+		// @todo: allow configuration for impulse strength
+		const FVector Impulse = HitResult.Normal * 100000.f;
+
+		bool bHandled = false;
+		// Special case to allow Corpses as the hit result that do not belong to the original receiver of the damage...
+		if (IRogueGameplayInterface* Interface = Cast<IRogueGameplayInterface>(TargetActor))
+		{
+			bHandled = Interface->AddImpulseAtLocationCustom(Impulse, HitResult.ImpactPoint, HitResult.BoneName);
+		}
+		
+		if (!bHandled && HitComp->bApplyImpulseOnDamage && HitComp->IsSimulatingPhysics(HitResult.BoneName))
+		{
+			HitComp->AddImpulseAtLocation(Impulse, HitResult.ImpactPoint, HitResult.BoneName);
+			// Alternative for more consistent defaults as it ignores Mass
+			//HitComp->AddVelocityChangeImpulseAtLocation(Direction * 3000000.f, HitResult.ImpactPoint, HitResult.BoneName);
 		}
 		return true;
 	}

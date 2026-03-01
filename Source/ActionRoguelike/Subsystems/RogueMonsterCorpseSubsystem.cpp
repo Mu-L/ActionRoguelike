@@ -3,13 +3,34 @@
 
 #include "RogueMonsterCorpseSubsystem.h"
 
+#include "Performance/RogueActorPoolingSubsystem.h"
+#include "World/RogueMonsterCorpse.h"
 
 
-void URogueMonsterCorpseSubsystem::AddCorpse(AActor* InActor)
+ARogueMonsterCorpse* URogueMonsterCorpseSubsystem::FetchCorpse(AActor* InActor, URogueMonsterData* MonsterData)
 {
-	Corpses.Enqueue(FMonsterCorpseInfo(InActor, GetWorld()->TimeSeconds));
-
 	CurrentCorpseCount++;
+	
+	FTransform SpawnTM = FTransform(InActor->GetActorRotation(), InActor->GetActorLocation());
+
+	URogueActorPoolingSubsystem* Pooler = GetWorld()->GetSubsystem<URogueActorPoolingSubsystem>();
+
+	ARogueMonsterCorpse* PooledCorpse = Pooler->AcquireFromPool<ARogueMonsterCorpse>(this, ARogueMonsterCorpse::StaticClass(), SpawnTM);
+	PooledCorpse->SetCorpseProperties(InActor->FindComponentByClass<USkeletalMeshComponent>(), MonsterData);
+
+	// Track to clean up after some time or limit reached
+	Corpses.Enqueue(FMonsterCorpseInfo(PooledCorpse, GetWorld()->TimeSeconds));
+
+	return PooledCorpse;
+}
+
+
+void URogueMonsterCorpseSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+
+	URogueActorPoolingSubsystem* Pooler = GetWorld()->GetSubsystem<URogueActorPoolingSubsystem>();
+	Pooler->PrimeActorPool(ARogueMonsterCorpse::StaticClass(), MaxCorpses);
 }
 
 
@@ -32,8 +53,8 @@ void URogueMonsterCorpseSubsystem::CleanupNextAvailableCorpse()
 	// If off-screen we can safely hide/delete - include fallback when above hard-limit, we always delete first even if potentially on-screen.
 	if (CurrentCorpseCount > MaxCorpses || !NextCorpse->Actor->WasRecentlyRendered())
 	{
-		// Alternatively we could hide the corpse and apply pooling on "corpses", simple actors containing only a skeletalmesh for ragdolling 
-		NextCorpse->Actor->Destroy();
+		URogueActorPoolingSubsystem* Pooler = GetWorld()->GetSubsystem<URogueActorPoolingSubsystem>();
+		Pooler->ReleaseToPool(NextCorpse->Actor.Get());
 
 		Corpses.Dequeue();
 		CurrentCorpseCount--;

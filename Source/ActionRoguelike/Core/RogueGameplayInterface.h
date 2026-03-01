@@ -7,6 +7,7 @@
 #include "RogueGameplayInterface.generated.h"
 
 class URogueActionComponent;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class URogueGameplayInterface : public UInterface
@@ -33,4 +34,17 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Interact(AController* InstigatorController);
+
+	/*
+	 * Retrieve the Data Asset for this Actor which defines important properties that sit outside of the main Blueprint
+	 */
+	virtual UDataAsset* GetActorConfigData() const { return nullptr; };
+	
+	/*
+	 * Allow custom handling of impulses per Actor (eg. remap certain bones to others that result in better hit reactions or redirect to another Actor such as Corpses)
+	 */
+	virtual bool AddImpulseAtLocationCustom(FVector Impulse, FVector Location, FName BoneName = NAME_None)
+	{
+		return false;
+	}
 };

@@ -50,6 +50,10 @@ void ARogueProjectile::PostInitializeComponents()
 	// More consistent to bind here compared to Constructor which may fail to bind if Blueprint was created before adding this binding (or when using hotreload)
 	// PostInitializeComponent is the preferred way of binding any events.
 	SphereComp->OnComponentHit.AddDynamic(this, &ARogueProjectile::OnActorHit);
+	
+	// Ignore both ways, reduces the number of overlaps we will ignore
+	SphereComp->IgnoreActorWhenMoving(GetInstigator(), true);
+	GetInstigator()->MoveIgnoreActorAdd(this);
 }
 
 

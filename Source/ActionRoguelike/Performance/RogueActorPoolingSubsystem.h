@@ -29,16 +29,18 @@ public:
 	static AActor* SpawnActorPooled(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, const FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod SpawnHandling);
 
 	static bool ReleaseToPool(AActor* Actor);
-	
-	static AActor* AcquireFromPool(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, const FTransform& SpawnTransform, FActorSpawnParameters SpawnParams);
+
+	template <class T>
+	static T* AcquireFromPool(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, const FTransform& SpawnTransform, FActorSpawnParameters SpawnParams = FActorSpawnParameters());
 
 	static bool IsPoolingEnabled(const UObject* WorldContextObject);
 
 	void PrimeActorPool(TSubclassOf<AActor> ActorClass, int32 Amount);
 
 protected:
-	
-	AActor* AcquireFromPool_Internal(TSubclassOf<AActor> ActorClass, const FTransform& SpawnTransform, FActorSpawnParameters SpawnParams);
+
+	template <class T>
+	T* AcquireFromPool_Internal(TSubclassOf<AActor> ActorClass, const FTransform& SpawnTransform, FActorSpawnParameters SpawnParams);
 
 	bool ReleaseToPool_Internal(AActor* Actor);
 

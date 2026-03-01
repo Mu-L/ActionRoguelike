@@ -6,18 +6,21 @@
 #include "GenericTeamAgentInterface.h"
 #include "ActionSystem/RogueActionSystemInterface.h"
 #include "ActionSystem/RogueAttributeSet.h"
+#include "Core/RogueGameplayInterface.h"
 #include "GameFramework/Character.h"
 #include "Performance/RogueSignificanceInterface.h"
 #include "RogueAICharacter.generated.h"
 
 
+class URogueMonsterData;
+class ARogueMonsterCorpse;
 class UNiagaraComponent;
 class UUserWidget;
 class URogueWorldUserWidget;
 class URogueActionComponent;
 
 UCLASS()
-class ACTIONROGUELIKE_API ARogueAICharacter : public ACharacter, public IGenericTeamAgentInterface, public IRogueSignificanceInterface, public IRogueActionSystemInterface
+class ACTIONROGUELIKE_API ARogueAICharacter : public ACharacter, public IGenericTeamAgentInterface, public IRogueSignificanceInterface, public IRogueActionSystemInterface, public IRogueGameplayInterface
 {
 	GENERATED_BODY()
 
@@ -29,7 +32,17 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastPlayAttackFX();
 
+	UPROPERTY()
+	TObjectPtr<ARogueMonsterCorpse> CorpseInstance;
+	
+	virtual bool AddImpulseAtLocationCustom(FVector Impulse, FVector Location, FName BoneName = NAME_None) override;
+
+	virtual UDataAsset* GetActorConfigData() const override;
+
 protected:
+
+	UPROPERTY(EditAnywhere, Category=Config)
+	TObjectPtr<URogueMonsterData> MonsterConfig;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
