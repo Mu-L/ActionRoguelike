@@ -20,7 +20,7 @@ You can read detailed information about this project and game features on the [D
 The game on the main branch has been updated over the years to keep up with the latest Unreal Engine release. Additionally, many new features are added to the project, often related to new Articles or Tutorials posted on [tomlooman.com](https://tomlooman.com). For students following the Unreal Engine C++ Courses, use one of these two branches:
 
 **For C++ Course Students:** 
-- **For the original UE4 version:** [Lecture29-FinishedProject](https://github.com/tomlooman/ActionRoguelike/tree/Lecture29-FinishedProject) for finished course code without additions all the way back to UE4.25.
+- **For the original UE4 version:** [UE4-Lecture29-FinishedProject](https://github.com/tomlooman/ActionRoguelike/tree/Lecture29-FinishedProject) for finished course code without additions all the way back to UE4.25.
 - **For the new UE5.6 version of the course:** [UE5.6-CourseProject](https://github.com/tomlooman/ActionRoguelike/tree/UE5.6-CourseProject) which has a commit URL with each lesson of the C++ course for easy reference.
 
 ![GitHub Branch Selection Info](https://tomlooman.com/assets/images/github_branchesinfo.jpg)
